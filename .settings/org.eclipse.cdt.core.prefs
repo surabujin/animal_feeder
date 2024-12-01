@@ -1,0 +1,11 @@
+doxygen/doxygen_new_line_after_brief=true
+doxygen/doxygen_use_brief_tag=false
+doxygen/doxygen_use_javadoc_tags=true
+doxygen/doxygen_use_pre_tag=false
+doxygen/doxygen_use_structural_commands=false
+eclipse.preferences.version=1
+environment/project/io.sloeber.core.sketch.0/append=true
+environment/project/io.sloeber.core.sketch.0/appendContributed=true
+environment/project/io.sloeber.core.sketch.0/compiler.cpp.flags/delimiter=\:
+environment/project/io.sloeber.core.sketch.0/compiler.cpp.flags/operation=replace
+environment/project/io.sloeber.core.sketch.0/compiler.cpp.flags/value=-c -g -Os ${compiler.warning_flags} -std\=gnu++11 -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -Wno-error\=narrowing -MMD -flto
