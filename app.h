@@ -18,12 +18,11 @@
 
 namespace animal_feeder {
 
-typedef lag::Periodic<uint16_t> Periodic16;
-
 class App;
 class AppState;
 
-class ActionBase: public Periodic16 {
+template<typename TTime>
+class ActionBase: public lag::Periodic<TTime> {
 protected:
     App *app;
 
@@ -35,19 +34,19 @@ public:
     void loop(App *app, const UptimeReference &uptime);
 };
 
-class RTCSyncSystemTimer: public ActionBase {
+class RTCSyncSystemTimer: public ActionBase<uint32_t> {
 public:
     RTCSyncSystemTimer(App*, uint16_t);
     virtual void action();
 };
 
-class RTCReadAction: public ActionBase {
+class RTCReadAction: public ActionBase<uint16_t> {
 public:
     RTCReadAction(App*, uint16_t);
     virtual void action();
 };
 
-class ScreenRedrawAction: public ActionBase {
+class ScreenRedrawAction: public ActionBase<uint16_t> {
 public:
     ScreenRedrawAction(App*, uint16_t);
     virtual void action();
@@ -60,12 +59,12 @@ protected:
         encoderS2PinNumber = 8,
         buttonPinNumber = 9;
 
-    static const int rtc_sync_system_timer_period_ms = 600 * 1000;
+    static const uint32_t rtc_sync_system_timer_period_ms = 600 * 1000L;
     static const int rtc_read_period_ms = 950;
 
 	AppState *state;
 
-	lag::Pulse<uint16_t, uint16_t> led;
+	lag::PinPulse<uint16_t, uint16_t> led;
 	rtc_t rtc;
 	ScreenDescriptor *screen_desc;
 	EncoderButton button;
@@ -101,10 +100,10 @@ public:
 
 	virtual void redraw();
 
-	inline const screen_t* get_screen() const;
+	inline screen_t* get_screen();
 	inline const ScreenDescriptor* get_screen_descriptor() const;
 
-	inline const rtc_t* get_rtc() const;
+	inline rtc_t* get_rtc();
 
 	inline Datime& address_now();
 

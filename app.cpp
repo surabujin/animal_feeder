@@ -76,7 +76,7 @@ void App::redraw() {
 	state->redraw();
 }
 
-inline const screen_t* App::get_screen() const {
+inline screen_t* App::get_screen() {
 	return screen_desc->get_screen();
 }
 
@@ -84,7 +84,7 @@ inline const ScreenDescriptor* App::get_screen_descriptor() const {
 	return screen_desc;
 }
 
-inline const rtc_t* App::get_rtc() const {
+inline rtc_t* App::get_rtc() {
 	return &rtc;
 }
 
@@ -126,11 +126,13 @@ inline void App::redraw_status_line() {
 
 // -- actions --
 
-ActionBase::ActionBase(App *app_ptr, uint16_t time_period) :
-        Periodic16(time_period), app(app_ptr) {}
+template<typename TTime>
+ActionBase<TTime>::ActionBase(App *app_ptr, uint16_t time_period) :
+        lag::Periodic<TTime>(time_period), app(app_ptr) {}
 
-void ActionBase::loop(App *app_ptr, const UptimeReference &uptime) {
-    Periodic16::loop(uptime);
+template<typename TTime>
+void ActionBase<TTime>::loop(App *app_ptr, const UptimeReference &uptime) {
+    lag::Periodic<TTime>::loop(uptime);
 }
 
 RTCSyncSystemTimer::RTCSyncSystemTimer(App *app_ptr, uint16_t time_period) :

@@ -18,7 +18,7 @@ protected:
 	T period_time_ms;
 
 public:
-	Periodic(T period_time) : period_time_ms(period_time) {}
+	Periodic(T time_period) : period_time_ms(time_period) {}
 	virtual ~Periodic() = default;
 
 	bool loop(const UptimeReference &uptime) {
