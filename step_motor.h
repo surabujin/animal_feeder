@@ -20,21 +20,39 @@ public:
 
 class StepMotorDrv {
 public:
-    static const uint8_t step_pulse_time_ms = 2;
+    static const uint8_t step_pulse_time_ms = 4;
+    static const unsigned int
+        dir_change_lag_ms = 1,
+        enable_lag_ms = 1,
+        reset_lag_ms = 1,
+        wake_up_lag_ms = 4;
 
 protected:
+    enum DrvState {
+        S_IDLE,
+        S_SET_PINS,
+        S_GENERATING,
+        S_RECONFIGURE
+    } state;
+
+    uint8_t dir_pin, enable_pin, reset_pin, sleep_pin;
+
     enum PinValueMask {
+        _PIN_MASK_NONE = 0,
+        _PIN_MASK_ALL = 0xff,
+
         PIN_MASK_DIR    = 0x01,
         PIN_MASK_ENABLE = 0x02,
         PIN_MASK_RESET  = 0x04,
         PIN_MASK_SLEEP  = 0x08
     };
+    uint8_t pin_values, pin_goal;
 
-    uint8_t dir_pin, enable_pin, reset_pin, sleep_pin;
-    uint8_t pin_values;
-
-    UptimeReference lag_till_uptime;
+    UptimeReference lag;
     StepPulse step_pulse;
+
+    unsigned int required_lag_ms;
+    uint16_t steps_goal;
 
 public:
     enum RotateDirection {
@@ -48,11 +66,19 @@ public:
             uint8_t sleep);
 
     void loop(const UptimeReference &uptime);
+private:
+    void loop_set_pins(const UptimeReference &uptime);
+    void loop_generating();
+    void loop_reconfigure();
+protected:
+    void enter_reconfigure();
 
+public:
     void request(RotateDirection dir, uint16_t steps_count);
+    bool is_generating();
 
-    void enable();
     void disable();
+    void enable();
 
     void reset();
     void clear_reset();
@@ -61,8 +87,11 @@ public:
     void wake_up();
 
 protected:
-    bool read_pin(uint8_t pin, PinValueMask mask);
-    void write_pin(uint8_t pin, bool value, PinValueMask mask);
+    void write_pin(uint8_t pin, bool value, PinValueMask mask, const unsigned int lag_add);
+
+private:
+    void setup_lag(const UptimeReference &uptime);
+    static uint8_t write_bits(const uint8_t bitmap, const uint8_t mask, const uint8_t value);
 };
 
 } // namespace animal_feeder

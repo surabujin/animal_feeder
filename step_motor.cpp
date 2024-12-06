@@ -3,6 +3,8 @@
  *
  */
 
+#include <Arduino.h>
+
 #include "step_motor.h"
 
 namespace animal_feeder {
@@ -14,27 +16,151 @@ StepMotorDrv::StepMotorDrv(uint8_t step, uint8_t dir, uint8_t enable,
         uint8_t reset, uint8_t sleep) :
         step_pulse(step, step_pulse_time_ms), dir_pin(dir), enable_pin(enable),
         reset_pin(reset), sleep_pin(sleep) {
-    pin_values = 0;
+    state = S_IDLE;
+    pin_values = pin_goal = 0;
+    required_lag_ms = 0;
+    steps_goal = 0;
 }
 
 void StepMotorDrv::loop(const UptimeReference &uptime) {
+    switch (state) {
+    case S_SET_PINS:
+        loop_set_pins(uptime);
+        break;
+    case S_GENERATING:
+        loop_generating();
+        break;
+    case S_RECONFIGURE:
+        loop_reconfigure();
+        break;
+    }
+
     step_pulse.loop(uptime);
-    // TODO lag
+}
+
+void StepMotorDrv::loop_set_pins(const UptimeReference &uptime) {
+    if (pin_values != pin_goal) {
+        uint8_t diff = pin_values ^ pin_goal;
+
+        if (diff & PIN_MASK_DIR)
+            write_pin(dir_pin, pin_goal & PIN_MASK_DIR, PIN_MASK_DIR, dir_change_lag_ms);
+        if (diff & PIN_MASK_ENABLE)
+            write_pin(enable_pin, pin_goal & PIN_MASK_ENABLE, PIN_MASK_ENABLE, enable_lag_ms);
+        if (diff & PIN_MASK_RESET)
+            write_pin(reset_pin, pin_goal & PIN_MASK_RESET, PIN_MASK_RESET, reset_lag_ms);
+        if (diff & PIN_MASK_SLEEP)
+            write_pin(sleep_pin, pin_goal & PIN_MASK_SLEEP, PIN_MASK_SLEEP, wake_up_lag_ms);
+
+        pin_values = pin_goal;  // must work without this line
+        setup_lag(uptime);
+    }
+
+    if (uptime < lag) {
+        return;
+    }
+
+    if (steps_goal) {
+        state = S_GENERATING;
+
+        step_pulse.set_limit(steps_goal);
+        step_pulse.start();
+        steps_goal = 0;
+    } else {
+        state = S_IDLE;
+    }
+}
+
+void StepMotorDrv::loop_generating() {
+    if (step_pulse.is_generating())
+        return;
+    state = S_IDLE;
+}
+
+void StepMotorDrv::loop_reconfigure() {
+    if (step_pulse.is_generating())
+        return;
+    state = S_SET_PINS;
+}
+
+void StepMotorDrv::enter_reconfigure() {
+    state = S_RECONFIGURE;
+    step_pulse.stop();
 }
 
 void StepMotorDrv::request(RotateDirection dir, uint16_t steps_count) {
-    RotateDirection dir_now =
-            read_pin(dir_pin, PIN_MASK_DIR) ?
-                    ROTATE_COUNTERCLOCKWISE : ROTATE_CLOCKWISE;
-    if (dir_now != dir) {
-        write_pin(dir_pin, static_cast<bool>(dir), PIN_MASK_DIR);
-        // TODO lag
+    write_bits(pin_goal, PIN_MASK_DIR, static_cast<bool>(dir) ? _PIN_MASK_ALL : _PIN_MASK_NONE);
+    steps_goal = steps_count;
+
+    switch (state) {
+    case S_IDLE:
+        state = S_SET_PINS;
+        break;
+
+    case S_SET_PINS:
+    case S_RECONFIGURE:
+        break;
+
+    case S_GENERATING:
+        if (pin_values == pin_goal) {
+            enter_reconfigure();
+        } else {
+            step_pulse.set_limit(step_pulse.get_iteration() + steps_goal);
+        }
+        break;
     }
+}
 
-    step_pulse.set_limit(steps_count);
-    step_pulse.start();
-    // TODO
+bool StepMotorDrv::is_generating() {
+    return state == S_GENERATING;
+}
 
+void StepMotorDrv::disable() {
+    write_bits(pin_goal, PIN_MASK_ENABLE, _PIN_MASK_NONE);  // reverse control
+    state = S_RECONFIGURE;
+}
+void StepMotorDrv::enable() {
+    write_bits(pin_goal, PIN_MASK_ENABLE, _PIN_MASK_ALL);
+    state = S_RECONFIGURE;
+}
+
+void StepMotorDrv::reset() {
+    write_bits(pin_goal, PIN_MASK_RESET, _PIN_MASK_NONE);  // reverse control
+    state = S_RECONFIGURE;
+}
+void StepMotorDrv::clear_reset() {
+    write_bits(pin_goal, PIN_MASK_RESET, _PIN_MASK_ALL);
+    state = S_RECONFIGURE;
+}
+
+void StepMotorDrv::sleep() {
+    write_bits(pin_goal, PIN_MASK_SLEEP, _PIN_MASK_NONE);  // reverse control
+    state = S_RECONFIGURE;
+}
+void StepMotorDrv::wake_up() {
+    write_bits(pin_goal, PIN_MASK_SLEEP, _PIN_MASK_ALL);
+    state = S_RECONFIGURE;
+}
+
+void StepMotorDrv::setup_lag(const UptimeReference &uptime) {
+    if (! required_lag_ms)
+        return;
+
+    if (lag < uptime)
+        lag.add(&uptime, required_lag_ms);
+    else
+        lag.add(required_lag_ms);
+    required_lag_ms = 0;
+}
+
+void StepMotorDrv::write_pin(uint8_t pin, bool value, PinValueMask mask, const unsigned int lag_add) {
+    digitalWrite(pin, value ? HIGH : LOW);
+    write_bits(pin_values, mask, value ? _PIN_MASK_ALL : _PIN_MASK_NONE);
+    required_lag_ms += lag_add;
+}
+
+uint8_t StepMotorDrv::write_bits(const uint8_t bitmap, const uint8_t mask, const uint8_t value) {
+    uint8_t result = bitmap & ~mask;
+    return result | (value & mask);
 }
 
 } // namespace animal_feeder

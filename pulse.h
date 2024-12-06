@@ -8,7 +8,9 @@
 
 #include <stdint.h>
 
-#ifndef AVR
+#ifdef AVR
+#include <Arduino.h>
+#else
 #include <iostream>
 #endif
 
