@@ -55,10 +55,10 @@ protected:
     uint16_t steps_goal;
 
 public:
-    enum RotateDirection {
-        ROTATE_CLOCKWISE,
-        ROTATE_COUNTERCLOCKWISE,
-        ROTATE_UNDEFINED
+    enum DirectionSet {
+        DIR_CLOCKWISE,
+        DIR_COUNTERCLOCKWISE,
+        DIR_UNDEFINED
     };
 
     StepMotorDrv(
@@ -74,7 +74,8 @@ protected:
     void enter_reconfigure();
 
 public:
-    void request(RotateDirection dir, uint16_t steps_count);
+    void request(DirectionSet dir, uint16_t steps_count);
+    void stop();
     bool is_generating();
 
     void disable();

@@ -16,6 +16,11 @@ App::App() :
 		rtc_sync_timer_action(this, rtc_sync_system_timer_period_ms),
 		rtc_read_action(this, rtc_read_period_ms),
 		button(this, buttonPinNumber), wheel(this, encoderS1PinNumber, encoderS2PinNumber),
+        feed_screw_motor(
+                feedScrewStepDriverStep, feedScrewStepDriverDir,
+                feedScrewStepDriverEnable, feedScrewStepDriverReset,
+                feedScrewStepDriverSleep),
+        feed_screw_actuator(feed_screw_motor),
 		user_input{0} {
 	screen_desc = ScreenDescriptor::get_instance();
 	state = new MainState(this);

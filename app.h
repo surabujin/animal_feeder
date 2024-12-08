@@ -12,6 +12,8 @@
 #include "periodic.h"
 #include "pulse.h"
 #include "encoder.h"
+#include "step_motor.h"
+#include "feed_screw.h"
 #include "utils.h"
 #include "ui.h"
 #include "ui_datetime.h"
@@ -22,7 +24,7 @@ class App;
 class AppState;
 
 template<typename TTime>
-class ActionBase: public lag::Periodic<TTime> {
+class ActionBase : public lag::Periodic<TTime> {
 protected:
     App *app;
 
@@ -54,7 +56,13 @@ public:
 
 class App : public AppInput {
 protected:
-    static const uint8_t
+    static const uint8_t  // pin mapping
+        feedScrewStepDriverDir = 2,
+        feedScrewStepDriverStep = 3,
+        feedScrewStepDriverSleep = 4,
+        feedScrewStepDriverReset = 5,
+        feedScrewStepDriverEnable = 5,
+
         encoderS1PinNumber = 7,
         encoderS2PinNumber = 8,
         buttonPinNumber = 9;
@@ -69,6 +77,8 @@ protected:
 	ScreenDescriptor *screen_desc;
 	EncoderButton button;
 	EncoderWheel wheel;
+	StepMotorDrv feed_screw_motor;
+	FeedScrewActuator feed_screw_actuator;
 
 	Datime now;
 

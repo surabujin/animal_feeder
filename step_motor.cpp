@@ -87,7 +87,7 @@ void StepMotorDrv::enter_reconfigure() {
     step_pulse.stop();
 }
 
-void StepMotorDrv::request(RotateDirection dir, uint16_t steps_count) {
+void StepMotorDrv::request(DirectionSet dir, uint16_t steps_count) {
     write_bits(pin_goal, PIN_MASK_DIR, static_cast<bool>(dir) ? _PIN_MASK_ALL : _PIN_MASK_NONE);
     steps_goal = steps_count;
 
@@ -110,35 +110,40 @@ void StepMotorDrv::request(RotateDirection dir, uint16_t steps_count) {
     }
 }
 
+void StepMotorDrv::stop() {
+    steps_goal = 0;
+    enter_reconfigure();
+}
+
 bool StepMotorDrv::is_generating() {
-    return state == S_GENERATING;
+    return state != S_IDLE;
 }
 
 void StepMotorDrv::disable() {
     write_bits(pin_goal, PIN_MASK_ENABLE, _PIN_MASK_NONE);  // reverse control
-    state = S_RECONFIGURE;
+    enter_reconfigure();
 }
 void StepMotorDrv::enable() {
     write_bits(pin_goal, PIN_MASK_ENABLE, _PIN_MASK_ALL);
-    state = S_RECONFIGURE;
+    enter_reconfigure();
 }
 
 void StepMotorDrv::reset() {
     write_bits(pin_goal, PIN_MASK_RESET, _PIN_MASK_NONE);  // reverse control
-    state = S_RECONFIGURE;
+    enter_reconfigure();
 }
 void StepMotorDrv::clear_reset() {
     write_bits(pin_goal, PIN_MASK_RESET, _PIN_MASK_ALL);
-    state = S_RECONFIGURE;
+    enter_reconfigure();
 }
 
 void StepMotorDrv::sleep() {
     write_bits(pin_goal, PIN_MASK_SLEEP, _PIN_MASK_NONE);  // reverse control
-    state = S_RECONFIGURE;
+    enter_reconfigure();
 }
 void StepMotorDrv::wake_up() {
     write_bits(pin_goal, PIN_MASK_SLEEP, _PIN_MASK_ALL);
-    state = S_RECONFIGURE;
+    enter_reconfigure();
 }
 
 void StepMotorDrv::setup_lag(const UptimeReference &uptime) {
