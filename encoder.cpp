@@ -13,11 +13,11 @@ EncoderButton::EncoderButton(AppInput *app_ptr, uint8_t pin) :
         NegativePinMonitor(pin), app(app_ptr) {}
 
 void EncoderButton::action(Signal signal) {
-    if (PULSE != signal)
+    if (PULSE == signal)
         app->button_event();
-    else if (LONG_PULSE_START)
+    else if (LONG_PULSE_START == signal)
         app->button_long_press(true);
-    else if (LONG_PULSE_END)
+    else if (LONG_PULSE_END == signal)
         app->button_long_press(false);
 }
 
@@ -30,7 +30,7 @@ void EncoderWheel::action(Signal signal) {
         return;
 
     int second = read_value(digitalRead(pin_s2_number));
-    app->wheel_event(second ? 1 : -1);
+    app->wheel_event(second ? -1 : 1);
 }
 
 } // namespace animal_feeder

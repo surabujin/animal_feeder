@@ -8,9 +8,9 @@
 
 namespace animal_feeder {
 
-FeedScrewActuator::FeedScrewActuator(StepMotorDrv &ext_driver,
+FeedScrewActuator::FeedScrewActuator(StepMotorDrv *driver_ptr,
         uint16_t forward_steps, uint16_t reverse_steps) :
-        driver(ext_driver), state(S_IDLE) {
+        driver(driver_ptr), state(S_IDLE) {
     flags = 0;
 
     iteration_forward_steps = forward_steps;
@@ -21,7 +21,7 @@ FeedScrewActuator::FeedScrewActuator(StepMotorDrv &ext_driver,
 }
 
 void FeedScrewActuator::loop(const UptimeReference &uptime) {
-    driver.loop(uptime);
+    driver->loop(uptime);
 
     switch (state) {
     case S_CHARGED:
@@ -30,7 +30,7 @@ void FeedScrewActuator::loop(const UptimeReference &uptime) {
 
     case S_FORWARD_REVOLUTION:
     case S_REVERSE_REVOLUTION:
-        if (! driver.is_generating())
+        if (! driver->is_generating())
             swap_direction(state == S_FORWARD_REVOLUTION);
         break;
     }
@@ -59,7 +59,7 @@ void FeedScrewActuator::plan_iteration() {
     uint16_t steps = calc_iteration_steps();
     if (0 < steps) {
         state = S_FORWARD_REVOLUTION;
-        driver.request(StepMotorDrv::DIR_CLOCKWISE, steps);
+        driver->request(StepMotorDrv::DIR_CLOCKWISE, steps);
     } else {
         state = S_IDLE;
     }
@@ -86,7 +86,7 @@ void FeedScrewActuator::swap_direction(bool is_forward_now) {
         return;
     }
 
-    driver.request(dir, steps);
+    driver->request(dir, steps);
     state = is_forward_now ? S_REVERSE_REVOLUTION : S_FORWARD_REVOLUTION;
 }
 

@@ -106,12 +106,12 @@ public:
 	virtual void loop(const UptimeReference &uptime);
 	virtual void button_event();
 	virtual void button_long_press(bool is_start);
-	virtual void wheel_event(uint8_t value);
+	virtual void wheel_event(int8_t value);
 
 	virtual void redraw();
 
 	inline screen_t* get_screen();
-	inline const ScreenDescriptor* get_screen_descriptor() const;
+	inline ScreenDescriptor* get_screen_descriptor() const;
 
 	inline rtc_t* get_rtc();
 
@@ -138,7 +138,7 @@ public:
 	virtual void loop(const UptimeReference &uptime);
 	virtual void button_event();
     virtual void button_long_press(bool is_start);
-	virtual void wheel_event(uint8_t value);
+	virtual void wheel_event(int8_t value);
 
 	virtual void redraw();
 };

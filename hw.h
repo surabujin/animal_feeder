@@ -34,7 +34,7 @@ public:
 
 	static ScreenDescriptor* get_instance();
 
-	screen_t *get_screen() const;
+	screen_t *get_screen();
     inline const uint16_t get_width_px() const;
     inline const uint16_t get_height_px() const;
 };
@@ -46,7 +46,7 @@ public:
     virtual void loop(const UptimeReference &uptime) = 0;
     virtual void button_event() = 0;
     virtual void button_long_press(bool is_start) = 0;
-    virtual void wheel_event(uint8_t value) = 0;
+    virtual void wheel_event(int8_t value) = 0;
 
     virtual void redraw() = 0;
 };

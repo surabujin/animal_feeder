@@ -20,7 +20,7 @@ App::App() :
                 feedScrewStepDriverStep, feedScrewStepDriverDir,
                 feedScrewStepDriverEnable, feedScrewStepDriverReset,
                 feedScrewStepDriverSleep),
-        feed_screw_actuator(feed_screw_motor),
+        feed_screw_actuator(&feed_screw_motor),
 		user_input{0} {
 	screen_desc = ScreenDescriptor::get_instance();
 	state = new MainState(this);
@@ -32,6 +32,12 @@ App::~App() {
 
 void App::init() {
     pinMode(LED_BUILTIN, OUTPUT);
+
+    pinMode(feedScrewStepDriverDir, OUTPUT);
+    pinMode(feedScrewStepDriverStep, OUTPUT);
+    pinMode(feedScrewStepDriverSleep, OUTPUT);
+    pinMode(feedScrewStepDriverReset, OUTPUT);
+    pinMode(feedScrewStepDriverEnable, OUTPUT);
 
     pinMode(encoderS1PinNumber, INPUT_PULLUP);
     pinMode(encoderS2PinNumber, INPUT_PULLUP);
@@ -45,12 +51,13 @@ void App::init() {
 }
 
 void App::loop(const UptimeReference &uptime) {
-	led.loop(uptime);  // TODO: убрать
+	led.loop(uptime);
 
     rtc_sync_timer_action.loop(this, uptime);
     rtc_read_action.loop(this, uptime);
     button.loop(uptime);
     wheel.loop(uptime);
+    feed_screw_actuator.loop(uptime); // will call feed_screw_motor.loop(uptiem) inside
 
     state->loop(uptime);
     swap_state();
@@ -64,13 +71,24 @@ void App::button_event() {
 }
 
 void App::button_long_press(bool is_start) {
-    user_input[LONG_START] += is_start;
+    user_input[LONG_START] += static_cast<int>(is_start);
+    // DEBUG
+    if (is_start) {
+        if (feed_screw_motor.is_sleeping()) {
+            feed_screw_motor.wake_up();
+            feed_screw_motor.clear_reset();
+        } else {
+            feed_screw_motor.reset();
+            feed_screw_motor.sleep();
+        }
+    }
+    // DEBUG
     state->button_long_press(is_start);
     swap_state();
     redraw_status_line();
 }
 
-void App::wheel_event(uint8_t value) {
+void App::wheel_event(int8_t value) {
     user_input[WHEEL] += value;
 	state->wheel_event(value);
     swap_state();
@@ -79,13 +97,14 @@ void App::wheel_event(uint8_t value) {
 
 void App::redraw() {
 	state->redraw();
+	redraw_status_line();  // DEBUG
 }
 
 inline screen_t* App::get_screen() {
 	return screen_desc->get_screen();
 }
 
-inline const ScreenDescriptor* App::get_screen_descriptor() const {
+inline ScreenDescriptor* App::get_screen_descriptor() const {
 	return screen_desc;
 }
 
@@ -117,9 +136,13 @@ inline void App::redraw_status_line() {
                 i ? " %d" : "%d", user_input[i]);
     }
 
+    screen->setCursorXY(0, 48);
+    screen->print(feed_screw_motor.is_enabled() ? 'E' : 'e');
+    screen->print(feed_screw_motor.is_reset() ? 'R' : 'r');
+    screen->print(feed_screw_motor.is_sleeping() ? 'S' : 's');
     screen->setCursorXY(0, 56);
     screen->print(buff);
-//    screen->print(' ');
+    screen->print(' ');
 //    screen->print(static_cast<int>(button.get_state()));
 //    screen->print(digitalRead(buttonPinNumber));
 //    screen->print(' ');
@@ -179,7 +202,7 @@ void AppState::button_event() {}
 
 void AppState::button_long_press(bool is_start) {}
 
-void AppState::wheel_event(uint8_t value) {}
+void AppState::wheel_event(int8_t value) {}
 
 void AppState::redraw() {
     ++frame_counter;
@@ -207,7 +230,7 @@ void MainState::loop(const UptimeReference &uptime) {
 }
 
 void MainState::redraw() {
-	const ScreenDescriptor *context = app->get_screen_descriptor();
+    ScreenDescriptor *context = app->get_screen_descriptor();
 
     screen_t *screen = app->get_screen();
 	ui::Point pivot(6, 8);
@@ -218,11 +241,6 @@ void MainState::redraw() {
 	px += size.get_width();
 	pivot = ui::Point(pivot.get_px() + px, pivot.get_py());
 	ui_time_now.draw(context, pivot, draw_flags);
-
-    screen->setCursorXY(0, 40);
-    screen->print(now.uptime);
-    screen->print(' ');
-    screen->print(now.loop);
 
     if (draw_flags & ui::DRAW_FORCE_F)
 	    app->redraw_status_line();

@@ -23,21 +23,18 @@ PinMonitor::PinMonitor(
 
 void PinMonitor::loop(const UptimeReference &uptime) {
     switch (state) {
-    case S_PASSIVE: {
-        int value = read();
-        if (!value)
+    case S_PASSIVE:
+        if (!read())
             break;
         state = S_TRANSIENT;
         lag_end_uptime.add(&uptime, time_unstable_ms);
         break;
-    }
 
-    case S_TRANSIENT: {
+    case S_TRANSIENT:
         if (uptime < lag_end_uptime)
             break;
         action(PASSIVE_TO_ACTIVE);
-        int value = read();
-        if (value) {
+        if (read()) {
             state = S_ACTIVE;
             lag_end_uptime.add(&uptime, time_long_pulse_ms);
         } else {
@@ -46,40 +43,30 @@ void PinMonitor::loop(const UptimeReference &uptime) {
             action(PULSE);
         }
         break;
-    }
 
-    case S_ACTIVE: {
-        int value = read();
-        bool lag_time = uptime < lag_end_uptime;
-        if (!value) {
-            state = S_PASSIVE;
-            action(ACTIVE_TO_PASSIVE);
-            if (lag_time)
-                action(PULSE);
-            else {
-                action(LONG_PULSE_START);
-                action(LONG_PULSE_END);
-            }
+    case S_ACTIVE:
+        if (lag_end_uptime < uptime) {
+            state = S_LONG_ACTIVE;
+            action(LONG_PULSE_START);
             break;
         }
 
-        if (!lag_time) {
-            state = S_LONG_ACTIVE;
-            action(LONG_PULSE_START);
+        if (!read()) {
+            state = S_PASSIVE;
+            action(ACTIVE_TO_PASSIVE);
+            action(PULSE);
         }
-        break;
-    }
 
-    case S_LONG_ACTIVE: {
-        int value = read();
-        if (value)
+        break;
+
+    case S_LONG_ACTIVE:
+        if (read())
             break;
 
         state = S_PASSIVE;
         action(ACTIVE_TO_PASSIVE);
         action(LONG_PULSE_END);
         break;
-    }
     }
 }
 

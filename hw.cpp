@@ -17,7 +17,7 @@ void ScreenDescriptor::init() {
 	screen.clear();
 }
 
-screen_t* ScreenDescriptor::get_screen() const {
+screen_t* ScreenDescriptor::get_screen() {
 	return &screen;
 }
 

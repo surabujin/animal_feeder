@@ -19,12 +19,12 @@ utils::datetime::DatimeMinutesAccess minutes_access;
 utils::datetime::DatimeSecondsAccess seconds_access;
 
 DatimePartWidget::DatimePartWidget(Datime *subject_ptr,
-		const DatimeAccess_t *adapter_ptr, const uint8_t length) :
-		subject(subject_ptr), adapter(adapter_ptr), length_ch(length) {
-	cache = 0;
+        DatimeAccess_t *adapter_ptr, const uint8_t length) :
+        subject(subject_ptr), adapter(adapter_ptr), length_ch(length) {
+    cache = 0;
 }
 
-void DatimePartWidget::draw(const ScreenDescriptor *context, const Point &location, const uint8_t flags) {
+void DatimePartWidget::draw(ScreenDescriptor *context, const Point &location, const uint8_t flags) {
 	uint16_t current = this->adapter->read(subject);
 	if (current == cache && !(flags & DRAW_FORCE_F)) {
 		return;
@@ -52,14 +52,12 @@ inline const Size2d DatimePartWidget::get_size() const {
 	return Size2d(char_width * length_ch, char_height);
 }
 
-DateTimeWidgetBase::DateTimeWidgetBase(
-		const parts_arr_t& parts, const spacers_arr_t& spacers) {
-
+DateTimeWidgetBase::DateTimeWidgetBase(parts_arr_t parts, spacers_arr_t spacers) {
 	this->parts = parts;
 	this->spacers = spacers;
 }
 
-void DateTimeWidgetBase::draw(const ScreenDescriptor *context, const Point &location, const uint8_t flags) {
+void DateTimeWidgetBase::draw(ScreenDescriptor *context, const Point &location, const uint8_t flags) {
 	Point pivot = location;
     for (int pi = 0, si = 0; pi < parts.len; pi++, si++) {
 		pivot = draw_and_step_h(context, &parts.reference[pi], pivot, flags);
@@ -78,10 +76,10 @@ inline const Size2d DateTimeWidgetBase::get_size() const {
 	return Size2d(w, char_height);
 }
 
-DateWidget::DateWidget(const Datime *subject_ptr) :
+DateWidget::DateWidget(Datime *subject_ptr) :
 		DateWidget(subject_ptr, parts_arr_t(parts, parts_count), spacers_arr_t(spacers, spacers_count)) {}
 
-DateWidget::DateWidget(const Datime *subject_ptr, const parts_arr_t &parts_ref, const spacers_arr_t &spacers_ref) :
+DateWidget::DateWidget(Datime *subject_ptr, parts_arr_t parts_ref, spacers_arr_t spacers_ref) :
 		parts { { subject_ptr, &years_access, 4 },
 				{ subject_ptr, &months_access, 2 },
 				{ subject_ptr, &days_access, 2 } },
@@ -89,10 +87,10 @@ DateWidget::DateWidget(const Datime *subject_ptr, const parts_arr_t &parts_ref, 
 		DateTimeWidgetBase(parts_ref, spacers_ref) {}
 
 
-TimeWidget::TimeWidget(const Datime *subject_ptr) :
+TimeWidget::TimeWidget(Datime *subject_ptr) :
 		TimeWidget(subject_ptr, parts_arr_t(parts, parts_count), spacers_arr_t(spacers, spacers_count)) {}
 
-TimeWidget::TimeWidget(const Datime *subject_ptr, const parts_arr_t &parts_ref, const spacers_arr_t &spacers_ref) :
+TimeWidget::TimeWidget(Datime *subject_ptr, parts_arr_t parts_ref, spacers_arr_t spacers_ref) :
 		parts { { subject_ptr, &hours_access, 2 },
 				{ subject_ptr, &minutes_access, 2 },
 				{ subject_ptr, &seconds_access, 2 } },

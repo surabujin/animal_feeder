@@ -9,18 +9,13 @@ App app;
 UptimeReference uptime;
 
 void setup() {
-    Serial.begin(115200);
+//    Serial.begin(115200);
+//    Serial.println("init()");
 
-	app.init();
-
-/*
-	Serial.begin(115200);
-	Serial.println("begin A3");
-*/
+    app.init();
 }
 
 void loop() {
-	uptime.update(millis());
-
-	app.loop(uptime);
+    uptime.update(millis());
+    app.loop(uptime);
 }

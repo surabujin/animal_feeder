@@ -66,11 +66,11 @@ public:
 
 	virtual ~WidgetBase() = default;
 
-	virtual void draw(const ScreenDescriptor *context, const Point &location, const uint8_t flags) = 0;
+	virtual void draw(ScreenDescriptor *context, const Point &location, const uint8_t flags) = 0;
 	virtual inline const Size2d get_size() const = 0;
 
 protected:
-	const Point draw_and_step_h(const ScreenDescriptor *context, WidgetBase *widget, const Point &location, const uint8_t flags);
+	const Point draw_and_step_h(ScreenDescriptor *context, WidgetBase *widget, const Point &location, const uint8_t flags);
 };
 
 class TextWidget : public WidgetBase {
@@ -86,7 +86,7 @@ protected:
 public:
 	TextWidget(const char *);
 
-	virtual void draw(const ScreenDescriptor *context, const Point &location, const uint8_t flags);
+	virtual void draw(ScreenDescriptor *context, const Point &location, const uint8_t flags);
 	virtual inline const Size2d get_size() const;
 };
 

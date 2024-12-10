@@ -31,7 +31,7 @@ protected:
     };
     uint8_t flags;
 
-    StepMotorDrv driver;
+    StepMotorDrv *driver;
 
     uint16_t iteration_forward_steps;
     uint16_t iteration_reverse_steps;
@@ -40,7 +40,7 @@ protected:
     uint16_t iteration;
 public:
     FeedScrewActuator(
-            StepMotorDrv &ext_driver,
+            StepMotorDrv *ext_driver,
             uint16_t forward_steps = iteration_reverse_dfl_steps,
             uint16_t reverse_steps = iteration_reverse_dfl_steps);
 

@@ -76,6 +76,10 @@ void StepMotorDrv::loop_generating() {
     state = S_IDLE;
 }
 
+const bool StepMotorDrv::is_ready() const {
+    return (pin_values & (PIN_MASK_ENABLE | PIN_MASK_RESET | PIN_MASK_SLEEP)) == (PIN_MASK_RESET | PIN_MASK_SLEEP);
+}
+
 void StepMotorDrv::loop_reconfigure() {
     if (step_pulse.is_generating())
         return;
@@ -88,7 +92,7 @@ void StepMotorDrv::enter_reconfigure() {
 }
 
 void StepMotorDrv::request(DirectionSet dir, uint16_t steps_count) {
-    write_bits(pin_goal, PIN_MASK_DIR, static_cast<bool>(dir) ? _PIN_MASK_ALL : _PIN_MASK_NONE);
+    pin_goal = write_bits(pin_goal, PIN_MASK_DIR, static_cast<bool>(dir) ? _PIN_MASK_ALL : _PIN_MASK_NONE);
     steps_goal = steps_count;
 
     switch (state) {
@@ -119,31 +123,44 @@ bool StepMotorDrv::is_generating() {
     return state != S_IDLE;
 }
 
-void StepMotorDrv::disable() {
-    write_bits(pin_goal, PIN_MASK_ENABLE, _PIN_MASK_NONE);  // reverse control
+void StepMotorDrv::enable() {
+    pin_goal = write_bits(pin_goal, PIN_MASK_ENABLE, _PIN_MASK_NONE);
     enter_reconfigure();
 }
-void StepMotorDrv::enable() {
-    write_bits(pin_goal, PIN_MASK_ENABLE, _PIN_MASK_ALL);
+
+void StepMotorDrv::disable() {
+    pin_goal = write_bits(pin_goal, PIN_MASK_ENABLE, _PIN_MASK_ALL);  // reverse control
     enter_reconfigure();
+}
+
+const bool StepMotorDrv::is_enabled() const {
+    return (pin_values & PIN_MASK_ENABLE) == 0;
 }
 
 void StepMotorDrv::reset() {
-    write_bits(pin_goal, PIN_MASK_RESET, _PIN_MASK_NONE);  // reverse control
+    pin_goal = write_bits(pin_goal, PIN_MASK_RESET, _PIN_MASK_NONE);  // reverse control
     enter_reconfigure();
 }
 void StepMotorDrv::clear_reset() {
-    write_bits(pin_goal, PIN_MASK_RESET, _PIN_MASK_ALL);
+    pin_goal = write_bits(pin_goal, PIN_MASK_RESET, _PIN_MASK_ALL);
     enter_reconfigure();
 }
 
+const bool StepMotorDrv::is_reset() const {
+    return (pin_values & PIN_MASK_RESET) == 0;
+}
+
 void StepMotorDrv::sleep() {
-    write_bits(pin_goal, PIN_MASK_SLEEP, _PIN_MASK_NONE);  // reverse control
+    pin_goal = write_bits(pin_goal, PIN_MASK_SLEEP, _PIN_MASK_NONE);  // reverse control
     enter_reconfigure();
 }
 void StepMotorDrv::wake_up() {
-    write_bits(pin_goal, PIN_MASK_SLEEP, _PIN_MASK_ALL);
+    pin_goal = write_bits(pin_goal, PIN_MASK_SLEEP, _PIN_MASK_ALL);
     enter_reconfigure();
+}
+
+const bool StepMotorDrv::is_sleeping() const {
+    return (pin_values & PIN_MASK_SLEEP) == 0;
 }
 
 void StepMotorDrv::setup_lag(const UptimeReference &uptime) {
@@ -159,7 +176,7 @@ void StepMotorDrv::setup_lag(const UptimeReference &uptime) {
 
 void StepMotorDrv::write_pin(uint8_t pin, bool value, PinValueMask mask, const unsigned int lag_add) {
     digitalWrite(pin, value ? HIGH : LOW);
-    write_bits(pin_values, mask, value ? _PIN_MASK_ALL : _PIN_MASK_NONE);
+    pin_values = write_bits(pin_values, mask, value ? _PIN_MASK_ALL : _PIN_MASK_NONE);
     required_lag_ms += lag_add;
 }
 

@@ -18,7 +18,7 @@ typedef uint16_t delay_t;
 class PinMonitor {
 protected:
     static const delay_t default_unstable_time = 50;
-    static const delay_t default_long_active_time = 1000;
+    static const delay_t default_long_active_time = 750;
 
     enum State {
         S_PASSIVE,

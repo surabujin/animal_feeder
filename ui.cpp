@@ -66,8 +66,8 @@ inline const Size2d& Box::get_size() const {
 	return size;
 }
 
-const Point WidgetBase::draw_and_step_h(
-		const ScreenDescriptor *context, WidgetBase *widget, const Point &location, const uint8_t flags) {
+const Point WidgetBase::draw_and_step_h(ScreenDescriptor *context,
+        WidgetBase *widget, const Point &location, const uint8_t flags) {
 	widget->draw(context, location, flags);
 	Size2d size = widget->get_size();
 	return Point(location.get_px() + size.get_width(), location.get_py());
@@ -77,7 +77,7 @@ TextWidget::TextWidget(const char *content) : text(content), flags(0) {
 	length_ch = strlen(text);
 }
 
-void TextWidget::draw(const ScreenDescriptor *context, const Point &location, const uint8_t flags) {
+void TextWidget::draw(ScreenDescriptor *context, const Point &location, const uint8_t flags) {
 	if (!(flags & DRAW_FORCE_F) && (this->flags & VISIBLE_F)) {
 		return;
 	}

@@ -28,12 +28,14 @@ public:
         wake_up_lag_ms = 4;
 
 protected:
+public: // DEBUG
     enum DrvState {
         S_IDLE,
         S_SET_PINS,
         S_GENERATING,
         S_RECONFIGURE
     } state;
+protected:  // DEBUG
 
     uint8_t dir_pin, enable_pin, reset_pin, sleep_pin;
 
@@ -77,15 +79,19 @@ public:
     void request(DirectionSet dir, uint16_t steps_count);
     void stop();
     bool is_generating();
+    const bool is_ready() const;
 
-    void disable();
     void enable();
+    void disable();
+    const bool is_enabled() const;
 
     void reset();
     void clear_reset();
+    const bool is_reset() const;
 
     void sleep();
     void wake_up();
+    const bool is_sleeping() const;
 
 protected:
     void write_pin(uint8_t pin, bool value, PinValueMask mask, const unsigned int lag_add);
