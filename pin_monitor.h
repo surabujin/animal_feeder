@@ -51,7 +51,7 @@ public:
     inline const uint8_t get_pin_number() const;
 
 protected:
-    virtual int read_hw_value();
+    virtual int read_hw_value(uint8_t);
     virtual int read_value(int value);
     virtual void action(Signal signal) = 0;
 

@@ -61,18 +61,19 @@ protected:
         feedScrewStepDriverStep = 3,
         feedScrewStepDriverSleep = 4,
         feedScrewStepDriverReset = 5,
-        feedScrewStepDriverEnable = 5,
+        feedScrewStepDriverEnable = 6,
+        feedScrewStepDriverFail = 7,
 
-        encoderS1PinNumber = 7,
-        encoderS2PinNumber = 8,
-        buttonPinNumber = 9;
+        encoderS1PinNumber = 12,
+        encoderS2PinNumber = 11,
+        buttonPinNumber = 10;
 
     static const uint32_t rtc_sync_system_timer_period_ms = 600 * 1000L;
     static const int rtc_read_period_ms = 950;
 
 	AppState *state;
 
-	lag::PinPulse<uint16_t, uint16_t> led;
+    lag::PinPulse<uint16_t, uint16_t> led;
 	rtc_t rtc;
 	ScreenDescriptor *screen_desc;
 	EncoderButton button;

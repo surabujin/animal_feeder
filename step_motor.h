@@ -20,7 +20,7 @@ public:
 
 class StepMotorDrv {
 public:
-    static const uint8_t step_pulse_time_ms = 4;
+    static const uint8_t step_pulse_time_ms = 1;
     static const unsigned int
         dir_change_lag_ms = 1,
         enable_lag_ms = 1,

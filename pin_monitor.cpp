@@ -70,8 +70,8 @@ void PinMonitor::loop(const UptimeReference &uptime) {
     }
 }
 
-int PinMonitor::read_hw_value() {
-    return digitalRead(pin_number);
+int PinMonitor::read_hw_value(uint8_t pin) {
+    return digitalRead(pin);
 }
 
 int PinMonitor::read_value(int value) {
@@ -83,7 +83,7 @@ inline const uint8_t PinMonitor::get_pin_number() const {
 }
 
 inline int PinMonitor::read() {
-    return read_value(read_hw_value());
+    return read_value(read_hw_value(pin_number));
 }
 
 NegativePinMonitor::NegativePinMonitor(uint8_t pin) :

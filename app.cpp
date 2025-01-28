@@ -12,7 +12,7 @@
 namespace animal_feeder {
 
 App::App() :
-		led(LED_BUILTIN, 500, 500),
+        led(LED_BUILTIN, 500, 500),
 		rtc_sync_timer_action(this, rtc_sync_system_timer_period_ms),
 		rtc_read_action(this, rtc_read_period_ms),
 		button(this, buttonPinNumber), wheel(this, encoderS1PinNumber, encoderS2PinNumber),
@@ -51,7 +51,7 @@ void App::init() {
 }
 
 void App::loop(const UptimeReference &uptime) {
-	led.loop(uptime);
+    led.loop(uptime);
 
     rtc_sync_timer_action.loop(this, uptime);
     rtc_read_action.loop(this, uptime);
@@ -65,6 +65,13 @@ void App::loop(const UptimeReference &uptime) {
 
 void App::button_event() {
     user_input[BUTTON] += 1;
+    // DEBUG
+    if (0 < user_input[WHEEL]) {
+        feed_screw_motor.request(StepMotorDrv::DIR_CLOCKWISE, user_input[WHEEL]);
+    } else {
+        feed_screw_motor.request(StepMotorDrv::DIR_COUNTERCLOCKWISE, 50);
+    }
+    // DEBUG
     state->button_event();
     swap_state();
     redraw_status_line();
@@ -75,11 +82,13 @@ void App::button_long_press(bool is_start) {
     // DEBUG
     if (is_start) {
         if (feed_screw_motor.is_sleeping()) {
+            feed_screw_motor.enable();
             feed_screw_motor.wake_up();
             feed_screw_motor.clear_reset();
         } else {
             feed_screw_motor.reset();
             feed_screw_motor.sleep();
+            feed_screw_motor.disable();
         }
     }
     // DEBUG
