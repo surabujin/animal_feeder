@@ -33,9 +33,6 @@ int16_t Point::get_py() const {
 	return py;
 }
 
-const uint8_t WidgetBase::char_width = 6;
-const uint8_t WidgetBase::char_height = 8;
-
 Size2d::Size2d(uint16_t w, uint16_t h) : width(w), height(h) {}
 
 Size2d::Size2d(const Size2d &other) {

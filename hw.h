@@ -39,18 +39,6 @@ public:
     inline const uint16_t get_height_px() const;
 };
 
-class AppInput {
-public:
-    virtual ~AppInput() = default;
-
-    virtual void loop(const UptimeReference &uptime) = 0;
-    virtual void button_event() = 0;
-    virtual void button_long_press(bool is_start) = 0;
-    virtual void wheel_event(int8_t value) = 0;
-
-    virtual void redraw() = 0;
-};
-
 // ScreenDescriptor getter/setters
 
 inline const uint16_t ScreenDescriptor::get_width_px() const {

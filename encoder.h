@@ -9,7 +9,7 @@
 #include <stdint.h>
 
 #include "pin_monitor.h"
-#include "hw.h"
+#include "app_base.h"
 
 namespace animal_feeder {
 

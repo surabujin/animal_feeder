@@ -62,7 +62,7 @@ public:
 
 class WidgetBase {
 public:
-	static const uint8_t char_width, char_height;
+    static const uint8_t char_width = 6, char_height = 8;
 
 	virtual ~WidgetBase() = default;
 

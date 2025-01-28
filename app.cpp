@@ -6,8 +6,11 @@
 #include <Arduino.h>
 
 #include "app.h"
+#include "s_main.h"
 
 #include "utils.h"
+//#include "ui.h"
+#include "ui_datetime.h"
 
 namespace animal_feeder {
 
@@ -109,19 +112,19 @@ void App::redraw() {
 	redraw_status_line();  // DEBUG
 }
 
-inline screen_t* App::get_screen() {
+screen_t* App::get_screen() {
 	return screen_desc->get_screen();
 }
 
-inline ScreenDescriptor* App::get_screen_descriptor() const {
+ScreenDescriptor* App::get_screen_descriptor() const {
 	return screen_desc;
 }
 
-inline rtc_t* App::get_rtc() {
+rtc_t* App::get_rtc() {
 	return &rtc;
 }
 
-inline Datime& App::address_now() {
+Datime& App::address_now() {
 	return now;
 }
 
@@ -129,7 +132,7 @@ void App::swap_state() {
 	// TODO
 }
 
-inline void App::redraw_status_line() {
+void App::redraw_status_line() {
     screen_t *screen = get_screen();
 
     const int screen_width_ch =
@@ -159,102 +162,6 @@ inline void App::redraw_status_line() {
 //    screen->print(digitalRead(encoderS1PinNumber));
 //    screen->print(' ');
 //    screen->print(digitalRead(encoderS1PinNumber));
-}
-
-// -- actions --
-
-template<typename TTime>
-ActionBase<TTime>::ActionBase(App *app_ptr, uint16_t time_period) :
-        lag::Periodic<TTime>(time_period), app(app_ptr) {}
-
-template<typename TTime>
-void ActionBase<TTime>::loop(App *app_ptr, const UptimeReference &uptime) {
-    lag::Periodic<TTime>::loop(uptime);
-}
-
-RTCSyncSystemTimer::RTCSyncSystemTimer(App *app_ptr, uint16_t time_period) :
-        ActionBase(app_ptr, time_period) {}
-
-void RTCSyncSystemTimer::action() {
-	rtc_t *rtc = app->get_rtc();
-	rtc->updateNow();
-}
-
-RTCReadAction::RTCReadAction(App *app_ptr, uint16_t time_period) :
-        ActionBase(app_ptr, time_period) {}
-
-void RTCReadAction::action() {
-	rtc_t *rtc = app->get_rtc();
-	app->address_now() = rtc->getTime();
-}
-
-ScreenRedrawAction::ScreenRedrawAction(App *app_ptr, uint16_t time_period) :
-        ActionBase(app_ptr, time_period) {}
-
-void ScreenRedrawAction::action() {
-	app->redraw();
-}
-
-// -- AppState --
-
-AppState::AppState(App *app_ptr) : app(app_ptr), frame_counter(0), draw_flags(0) {}
-
-void AppState::enter() {
-    draw_flags = ui::DRAW_FORCE_F;
-}
-
-void AppState::exit() {}
-
-void AppState::loop(const UptimeReference &uptime) {}
-
-void AppState::button_event() {}
-
-void AppState::button_long_press(bool is_start) {}
-
-void AppState::wheel_event(int8_t value) {}
-
-void AppState::redraw() {
-    ++frame_counter;
-    draw_flags &= ~ui::DRAW_FORCE_F;
-}
-
-// -- MainState --
-
-MainState::MainState(App *app_ptr) :
-		AppState(app_ptr),
-		ui_date_now(&app_ptr->address_now()),
-		ui_time_now(&app_ptr->address_now()),
-		redraw_action(app_ptr, screen_redraw_period_ms) {}
-
-void MainState::enter() {
-	screen_t *screen = app->get_screen();
-	screen->clear();
-
-    draw_flags |= ui::DRAW_FORCE_F;
-}
-
-void MainState::loop(const UptimeReference &uptime) {
-    now = uptime;
-	redraw_action.loop(app, uptime);
-}
-
-void MainState::redraw() {
-    ScreenDescriptor *context = app->get_screen_descriptor();
-
-    screen_t *screen = app->get_screen();
-	ui::Point pivot(6, 8);
-	ui_date_now.draw(context, pivot, draw_flags);
-
-	uint16_t px = pivot.get_px();
-	ui::Size2d size = ui_date_now.get_size();
-	px += size.get_width();
-	pivot = ui::Point(pivot.get_px() + px, pivot.get_py());
-	ui_time_now.draw(context, pivot, draw_flags);
-
-    if (draw_flags & ui::DRAW_FORCE_F)
-	    app->redraw_status_line();
-
-    AppState::redraw();
 }
 
 } // namespace
