@@ -11,6 +11,7 @@
 #include "utils.h"
 //#include "ui.h"
 #include "ui_datetime.h"
+#include "avr_mem.h"
 
 namespace animal_feeder {
 
@@ -152,6 +153,9 @@ void App::redraw_status_line() {
     screen->print(feed_screw_motor.is_enabled() ? 'E' : 'e');
     screen->print(feed_screw_motor.is_reset() ? 'R' : 'r');
     screen->print(feed_screw_motor.is_sleeping() ? 'S' : 's');
+    screen->print(' ');
+    for (size_t count = screen->print(devtools::freeMemory()); count < 5; count++)
+        screen->print(' ');
     screen->setCursorXY(0, 56);
     screen->print(buff);
     screen->print(' ');
