@@ -36,8 +36,8 @@ public:
 
 class DateTimeWidgetBase : public WidgetBase {
 public:
-	typedef ArrReference<DatimePartWidget> parts_arr_t;
-	typedef ArrReference<TextWidget> spacers_arr_t;
+    typedef embd::ArrReference<DatimePartWidget> parts_arr_t;
+    typedef embd::ArrReference<TextWidget> spacers_arr_t;
 
 protected:
 	parts_arr_t parts;

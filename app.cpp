@@ -54,7 +54,7 @@ void App::init() {
     led.start();
 }
 
-void App::loop(const UptimeReference &uptime) {
+void App::loop(const embd::UptimeReference &uptime) {
     led.loop(uptime);
 
     rtc_sync_timer_action.loop(this, uptime);

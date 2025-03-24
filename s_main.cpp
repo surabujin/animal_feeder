@@ -23,7 +23,7 @@ void MainState::enter() {
     draw_flags |= ui::DRAW_FORCE_F;
 }
 
-void MainState::loop(const UptimeReference &uptime) {
+void MainState::loop(const embd::UptimeReference &uptime) {
     now = uptime;
     redraw_action.loop(app, uptime);
 }

@@ -50,7 +50,7 @@ protected:  // DEBUG
     };
     uint8_t pin_values, pin_goal;
 
-    UptimeReference lag;
+    embd::UptimeReference lag;
     StepPulse step_pulse;
 
     unsigned int required_lag_ms;
@@ -67,9 +67,9 @@ public:
             uint8_t step, uint8_t dir, uint8_t enable, uint8_t reset,
             uint8_t sleep);
 
-    void loop(const UptimeReference &uptime);
+    void loop(const embd::UptimeReference &uptime);
 private:
-    void loop_set_pins(const UptimeReference &uptime);
+    void loop_set_pins(const embd::UptimeReference &uptime);
     void loop_generating();
     void loop_reconfigure();
 protected:
@@ -97,7 +97,7 @@ protected:
     void write_pin(uint8_t pin, bool value, PinValueMask mask, const unsigned int lag_add);
 
 private:
-    void setup_lag(const UptimeReference &uptime);
+    void setup_lag(const embd::UptimeReference &uptime);
     static uint8_t write_bits(const uint8_t bitmap, const uint8_t mask, const uint8_t value);
 };
 

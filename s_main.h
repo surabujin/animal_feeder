@@ -21,7 +21,7 @@ class MainState : public AppState {
 protected:
     static const uint16_t screen_redraw_period_ms = 500;
 
-    UptimeReference now;
+    embd::UptimeReference now;
 
     ui::DateWidget ui_date_now;
     ui::TimeWidget ui_time_now;
@@ -34,7 +34,7 @@ public:
 
     virtual void enter() override;
 
-    virtual void loop(const UptimeReference &uptime);
+    virtual void loop(const embd::UptimeReference &uptime);
     virtual void redraw();
 };
 

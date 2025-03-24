@@ -9,6 +9,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+namespace embd {
+
 class UptimeReference {
 public:
 	UptimeReference();
@@ -19,7 +21,6 @@ public:
 	void add(unsigned long value);
 	void add(const UptimeReference *reference, unsigned long value);
 	bool operator < (const UptimeReference &reference) const;
-protected:
 public:
 	uint8_t loop;
 	unsigned long uptime;
@@ -33,5 +34,7 @@ struct ArrReference {
 	ArrReference() : reference(nullptr), len(0) {}
 	ArrReference(T *ref, size_t l) : reference(ref), len(l) {}
 };
+
+} // namespace embd
 
 #endif /* UTILS_H_ */

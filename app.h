@@ -8,6 +8,7 @@
 
 #include <stdint.h>
 
+#include "common.h"
 #include "hw.h"
 #include "app_base.h"
 #include "app_action.h"
@@ -18,7 +19,7 @@
 
 namespace animal_feeder {
 
-class App : public AppInput {
+class App : public embd::AppBase, public AppInput {
 protected:
     static const uint8_t  // pin mapping
         feedScrewStepDriverDir = 2,
@@ -47,7 +48,7 @@ protected:
 
 	Datime now;
 
-	UptimeReference rtc_sync_at;
+    embd::UptimeReference rtc_sync_at;
 
 	enum USER_INPUT_EVENTS {
 	    BUTTON,
@@ -66,9 +67,9 @@ public:
 	App();
 	~App();
 
-	void init();
+    virtual void init();
+    virtual void loop(const embd::UptimeReference &);
 
-	virtual void loop(const UptimeReference &uptime);
 	virtual void button_event();
 	virtual void button_long_press(bool is_start);
 	virtual void wheel_event(int8_t value);
@@ -83,6 +84,7 @@ public:
     Datime& address_now();
 
     void redraw_status_line();
+
 private:
 	void swap_state();
 };

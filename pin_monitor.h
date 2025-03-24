@@ -31,7 +31,7 @@ protected:
     delay_t time_unstable_ms;
     delay_t time_long_pulse_ms;
 
-    UptimeReference lag_end_uptime;
+    embd::UptimeReference lag_end_uptime;
 
 public:
     enum Signal {
@@ -46,7 +46,7 @@ public:
     PinMonitor(uint8_t pin, delay_t time_unstable, delay_t long_active);
     virtual ~PinMonitor() = default;
 
-    void loop(const UptimeReference &uptime);
+    void loop(const embd::UptimeReference &uptime);
 
     inline const uint8_t get_pin_number() const;
 

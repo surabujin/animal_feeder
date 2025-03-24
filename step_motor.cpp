@@ -22,7 +22,7 @@ StepMotorDrv::StepMotorDrv(uint8_t step, uint8_t dir, uint8_t enable,
     steps_goal = 0;
 }
 
-void StepMotorDrv::loop(const UptimeReference &uptime) {
+void StepMotorDrv::loop(const embd::UptimeReference &uptime) {
     switch (state) {
     case S_SET_PINS:
         loop_set_pins(uptime);
@@ -38,7 +38,7 @@ void StepMotorDrv::loop(const UptimeReference &uptime) {
     step_pulse.loop(uptime);
 }
 
-void StepMotorDrv::loop_set_pins(const UptimeReference &uptime) {
+void StepMotorDrv::loop_set_pins(const embd::UptimeReference &uptime) {
     if (pin_values != pin_goal) {
         uint8_t diff = pin_values ^ pin_goal;
 
@@ -163,7 +163,7 @@ const bool StepMotorDrv::is_sleeping() const {
     return (pin_values & PIN_MASK_SLEEP) == 0;
 }
 
-void StepMotorDrv::setup_lag(const UptimeReference &uptime) {
+void StepMotorDrv::setup_lag(const embd::UptimeReference &uptime) {
     if (! required_lag_ms)
         return;
 

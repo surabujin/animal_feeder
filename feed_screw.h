@@ -44,7 +44,7 @@ public:
             uint16_t forward_steps = iteration_reverse_dfl_steps,
             uint16_t reverse_steps = iteration_reverse_dfl_steps);
 
-    void loop(const UptimeReference &uptime);
+    void loop(const embd::UptimeReference &uptime);
 
     void control(const uint16_t steps);
     const bool is_active() const;

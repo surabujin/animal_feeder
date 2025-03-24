@@ -5,6 +5,8 @@
 
 #include "utils.h"
 
+namespace embd {
+
 UptimeReference::UptimeReference() : loop(0), uptime(0) {}
 
 UptimeReference::UptimeReference(unsigned long millisValue) : loop(0), uptime(millisValue) {}
@@ -33,3 +35,5 @@ bool UptimeReference::operator <(const UptimeReference &reference) const {
 		return false;
 	return uptime < reference.uptime;
 }
+
+} // namespace embd

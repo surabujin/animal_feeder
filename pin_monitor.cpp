@@ -21,7 +21,7 @@ PinMonitor::PinMonitor(
     state = S_PASSIVE;
 }
 
-void PinMonitor::loop(const UptimeReference &uptime) {
+void PinMonitor::loop(const embd::UptimeReference &uptime) {
     switch (state) {
     case S_PASSIVE:
         if (!read())

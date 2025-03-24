@@ -13,7 +13,7 @@ namespace lag {
 template<typename T>
 class Periodic {
 protected:
-	UptimeReference period_end_at;
+    embd::UptimeReference period_end_at;
 
 	T period_time_ms;
 
@@ -21,7 +21,7 @@ public:
 	Periodic(T time_period) : period_time_ms(time_period) {}
 	virtual ~Periodic() = default;
 
-	bool loop(const UptimeReference &uptime) {
+    bool loop(const embd::UptimeReference &uptime) {
 		if (uptime < period_end_at)
 			return false;
 
@@ -32,7 +32,7 @@ public:
 
 	virtual void action() = 0;
 
-	inline const UptimeReference* get_period_end() const {
+    inline const embd::UptimeReference* get_period_end() const {
 		return &period_end_at;
 	}
 };

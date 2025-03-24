@@ -20,7 +20,7 @@ FeedScrewActuator::FeedScrewActuator(StepMotorDrv *driver_ptr,
     iteration = 0;
 }
 
-void FeedScrewActuator::loop(const UptimeReference &uptime) {
+void FeedScrewActuator::loop(const embd::UptimeReference &uptime) {
     driver->loop(uptime);
 
     switch (state) {

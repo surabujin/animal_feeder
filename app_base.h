@@ -18,7 +18,7 @@ class AppInput {
 public:
     virtual ~AppInput() = default;
 
-    virtual void loop(const UptimeReference &uptime) = 0;
+    virtual void loop(const embd::UptimeReference &uptime) = 0;
     virtual void button_event() = 0;
     virtual void button_long_press(bool is_start) = 0;
     virtual void wheel_event(int8_t value) = 0;
@@ -39,7 +39,7 @@ public:
     virtual void enter();
     virtual void exit();
 
-    virtual void loop(const UptimeReference &uptime);
+    virtual void loop(const embd::UptimeReference &uptime);
     virtual void button_event();
     virtual void button_long_press(bool is_start);
     virtual void wheel_event(int8_t value);

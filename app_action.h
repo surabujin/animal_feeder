@@ -25,7 +25,7 @@ protected:
 public:
     ~ActionBase() = default;
 
-    void loop(App *app_ptr, const UptimeReference &uptime) {
+    void loop(App *app_ptr, const embd::UptimeReference &uptime) {
         lag::Periodic<TTime>::loop(uptime);
     }
 };

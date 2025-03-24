@@ -18,6 +18,8 @@
 
 namespace lag {
 
+using embd::UptimeReference;
+
 template<typename TTime, typename TCount>
 class Pulse {
 	enum Flags {

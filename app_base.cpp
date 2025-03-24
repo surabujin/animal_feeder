@@ -20,7 +20,7 @@ void AppState::enter() {
 void AppState::exit() {
 }
 
-void AppState::loop(const UptimeReference &uptime) {
+void AppState::loop(const embd::UptimeReference &uptime) {
 }
 
 void AppState::button_event() {
