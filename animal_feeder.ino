@@ -2,6 +2,7 @@
 
 #include "utils.h"
 #include "app.h"
+#include "error.h"
 
 using namespace animal_feeder;
 
@@ -14,6 +15,7 @@ void setup() {
 //    Serial.begin(115200);
 //    Serial.println("init()");
     current = &app;
+//    current = new embd::AppErrorAlternate(42);
     current->init();
 }
 
