@@ -33,10 +33,9 @@ void MainState::redraw() {
 
     screen_t *screen = app->get_screen();
     ui::Point pivot(6, 8);
-    ui_date_now.draw(context, pivot, draw_flags);
+    ui::Size2d size = ui_date_now.draw(context, pivot, draw_flags);
 
     uint16_t px = pivot.get_px();
-    ui::Size2d size = ui_date_now.get_size();
     px += size.get_width();
     pivot = ui::Point(pivot.get_px() + px, pivot.get_py());
     ui_time_now.draw(context, pivot, draw_flags);

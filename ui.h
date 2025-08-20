@@ -60,17 +60,27 @@ public:
 	inline const Size2d& get_size() const;
 };
 
+class PointPair{
+protected:
+    Point first, second;
+
+public:
+    PointPair(const Point&, const Point&);
+
+    const Point get_first() const;
+    const Point get_second() const;
+};
+
 class WidgetBase {
 public:
     static const uint8_t char_width = 6, char_height = 8;
 
 	virtual ~WidgetBase() = default;
 
-	virtual void draw(ScreenDescriptor *context, const Point &location, const uint8_t flags) = 0;
-	virtual inline const Size2d get_size() const = 0;
+	virtual const Size2d draw(ScreenDescriptor *context, const Point &location, const uint8_t flags) = 0;
 
 protected:
-	const Point draw_and_step_h(ScreenDescriptor *context, WidgetBase *widget, const Point &location, const uint8_t flags);
+    const PointPair draw_and_step(ScreenDescriptor *context, WidgetBase *widget, const Point &location, const uint8_t flags);
 };
 
 class TextWidget : public WidgetBase {
@@ -86,7 +96,7 @@ protected:
 public:
 	TextWidget(const char *);
 
-	virtual void draw(ScreenDescriptor *context, const Point &location, const uint8_t flags);
+	virtual const Size2d draw(ScreenDescriptor *context, const Point &location, const uint8_t flags);
 	virtual inline const Size2d get_size() const;
 };
 

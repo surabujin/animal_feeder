@@ -24,10 +24,12 @@ DatimePartWidget::DatimePartWidget(Datime *subject_ptr,
     cache = 0;
 }
 
-void DatimePartWidget::draw(ScreenDescriptor *context, const Point &location, const uint8_t flags) {
-	uint16_t current = this->adapter->read(subject);
+const Size2d DatimePartWidget::draw(ScreenDescriptor *context, const Point &location, const uint8_t flags) {
+    const Size2d screen_size(char_width * length_ch, char_height);
+
+    uint16_t current = this->adapter->read(subject);
 	if (current == cache && !(flags & DRAW_FORCE_F)) {
-		return;
+        return screen_size;
 	}
 	cache = current;
 
@@ -46,10 +48,8 @@ void DatimePartWidget::draw(ScreenDescriptor *context, const Point &location, co
     screen_t *screen = context->get_screen();
     screen->setCursorXY(location.get_px(), location.get_py());
     screen->print(buff);
-}
 
-inline const Size2d DatimePartWidget::get_size() const {
-	return Size2d(char_width * length_ch, char_height);
+    return screen_size;
 }
 
 DateTimeWidgetBase::DateTimeWidgetBase(parts_arr_t parts, spacers_arr_t spacers) {
@@ -57,23 +57,19 @@ DateTimeWidgetBase::DateTimeWidgetBase(parts_arr_t parts, spacers_arr_t spacers)
 	this->spacers = spacers;
 }
 
-void DateTimeWidgetBase::draw(ScreenDescriptor *context, const Point &location, const uint8_t flags) {
-	Point pivot = location;
-    for (int pi = 0, si = 0; pi < parts.len; pi++, si++) {
-		pivot = draw_and_step_h(context, &parts.reference[pi], pivot, flags);
+const Size2d DateTimeWidgetBase::draw(ScreenDescriptor *context, const Point &location, const uint8_t flags) {
+    PointPair step(location, location);
+    int size_y;
+	for (int pi = 0, si = 0; pi < parts.len; pi++, si++) {
+        step = draw_and_step(context, &parts.reference[pi], step.get_first(), flags);
+        size_y = max(size_y, step.get_second().get_py() - location.get_py());
 		if (si < spacers.len) {
-			pivot = draw_and_step_h(context, &spacers.reference[si], pivot, flags);
+            step = draw_and_step(context, &spacers.reference[si], step.get_first(), flags);
+            size_y = max(size_y, step.get_second().get_py() - location.get_py());
 		}
 	}
-}
 
-inline const Size2d DateTimeWidgetBase::get_size() const {
-    uint16_t w = 0;
-    for (int i = 0; i < parts.len; i++)
-        w += parts.reference[i].get_size().get_width();
-    for (int i = 0; i < spacers.len; i++)
-        w += spacers.reference[i].get_size().get_width();
-	return Size2d(w, char_height);
+	return Size2d(step.get_first().get_px() - location.get_px(), size_y);
 }
 
 DateWidget::DateWidget(Datime *subject_ptr) :

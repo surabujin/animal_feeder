@@ -30,8 +30,7 @@ protected:
 public:
     DatimePartWidget(Datime*, DatimeAccess_t*, const uint8_t);
 
-	virtual void draw(ScreenDescriptor *context, const Point &location, const uint8_t flags);
-	virtual inline const Size2d get_size() const;
+    virtual const Size2d draw(ScreenDescriptor *context, const Point &location, const uint8_t flags);
 };
 
 class DateTimeWidgetBase : public WidgetBase {
@@ -47,8 +46,7 @@ protected:
 	DateTimeWidgetBase(parts_arr_t, spacers_arr_t);
 
 public:
-	virtual void draw(ScreenDescriptor *context, const Point &location, const uint8_t flags);
-	virtual inline const Size2d get_size() const;
+    virtual const Size2d draw(ScreenDescriptor *context, const Point &location, const uint8_t flags);
 };
 
 class DateWidget : public DateTimeWidgetBase {

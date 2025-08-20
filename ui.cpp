@@ -63,26 +63,36 @@ inline const Size2d& Box::get_size() const {
 	return size;
 }
 
-const Point WidgetBase::draw_and_step_h(ScreenDescriptor *context,
+PointPair::PointPair(const Point &a, const Point &b): first(a), second(b) {}
+
+const Point PointPair::get_first() const { return first; }
+const Point PointPair::get_second() const { return second; }
+
+const PointPair WidgetBase::draw_and_step(ScreenDescriptor *context,
         WidgetBase *widget, const Point &location, const uint8_t flags) {
-	widget->draw(context, location, flags);
-	Size2d size = widget->get_size();
-	return Point(location.get_px() + size.get_width(), location.get_py());
+    Size2d size = widget->draw(context, location, flags);
+
+    Point step_h(location.get_px() + size.get_width(), location.get_py());
+    Point step_v(location.get_px(), location.get_py() + size.get_height());
+    return PointPair(step_h, step_v);
 }
 
 TextWidget::TextWidget(const char *content) : text(content), flags(0) {
 	length_ch = strlen(text);
 }
 
-void TextWidget::draw(ScreenDescriptor *context, const Point &location, const uint8_t flags) {
-	if (!(flags & DRAW_FORCE_F) && (this->flags & VISIBLE_F)) {
-		return;
+const Size2d TextWidget::draw(ScreenDescriptor *context, const Point &location, const uint8_t flags) {
+    const Size2d screen_size(length_ch * char_width, char_height);
+    if (!(flags & DRAW_FORCE_F) && (this->flags & VISIBLE_F)) {
+        return screen_size;
 	}
 
 	screen_t *screen = context->get_screen();
 	screen->setCursorXY(location.get_px(), location.get_py());
 	screen->print(text);
 	this->flags |= VISIBLE_F;
+
+    return screen_size;
 }
 
 inline const Size2d TextWidget::get_size() const {
