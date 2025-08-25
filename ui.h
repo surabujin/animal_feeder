@@ -34,8 +34,8 @@ public:
 	int16_t get_px() const;
 	int16_t get_py() const;
 
-    const Point add_x(int16_t value);
-    const Point add_y(int16_t value);
+    const Point add_x(int16_t value) const;
+    const Point add_y(int16_t value) const;
 };
 
 class Size2d {
@@ -66,10 +66,13 @@ public:
 
 class PointPair{
 protected:
-    Point first, second;
+    const Point first, second;
 
 public:
     PointPair(const Point&, const Point&);
+    PointPair(const PointPair&);
+
+    PointPair& operator =(const Point&) = delete;
 
     const Point get_first() const;
     const Point get_second() const;

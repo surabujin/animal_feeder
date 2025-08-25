@@ -39,6 +39,8 @@ public:
     virtual void enter() override;
 
     virtual void loop(const embd::UptimeReference &uptime);
+    virtual void wheel_event(int8_t value);
+
     virtual void redraw();
 };
 

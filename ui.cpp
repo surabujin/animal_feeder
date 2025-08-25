@@ -33,8 +33,8 @@ int16_t Point::get_py() const {
 	return py;
 }
 
-const Point Point::add_x(int16_t value) { return Point(px + value, py); }
-const Point Point::add_y(int16_t value) { return Point(px, py + value); }
+const Point Point::add_x(int16_t value) const { return Point(px + value, py); }
+const Point Point::add_y(int16_t value) const { return Point(px, py + value); }
 
 Size2d::Size2d(): width(0), height(0) {}
 
@@ -69,6 +69,7 @@ inline const Size2d& Box::get_size() const {
 }
 
 PointPair::PointPair(const Point &a, const Point &b): first(a), second(b) {}
+PointPair::PointPair(const PointPair &other) : first(other.first), second(other.second) {}
 
 const Point PointPair::get_first() const { return first; }
 const Point PointPair::get_second() const { return second; }
@@ -76,10 +77,9 @@ const Point PointPair::get_second() const { return second; }
 const PointPair WidgetBase::draw_and_step(ScreenDescriptor *context,
         WidgetBase *widget, const Point &location, const uint8_t flags) {
     Size2d size = widget->draw(context, location, flags);
-
-    Point step_h(location.get_px() + size.get_width(), location.get_py());
-    Point step_v(location.get_px(), location.get_py() + size.get_height());
-    return PointPair(step_h, step_v);
+    return PointPair(
+            location.add_x(size.get_width()),
+            location.add_y(size.get_height()));
 }
 
 TextWidget::TextWidget(const char *content) : text(content), flags(0) {

@@ -51,6 +51,19 @@ void MainState::loop(const embd::UptimeReference &uptime) {
     redraw_action.loop(app, uptime);
 }
 
+void MainState::wheel_event(int8_t value) {
+    if (0 < value) {
+        while (0 < value--)
+            menu->event_next();
+    } else {
+        while (value++ < 0) {
+            menu->event_prev();
+        }
+    }
+
+    redraw();
+}
+
 void MainState::redraw() {
     ScreenDescriptor *context = app->get_screen_descriptor();
 
@@ -59,7 +72,7 @@ void MainState::redraw() {
     pivot = pivot.add_x(ui::WidgetBase::char_width);
     ui_time_now.draw(context, pivot, draw_flags);
 
-    pivot = ui::Point(0, 2 * ui::WidgetBase::char_height);
+    pivot = ui::Point(0, 1 * ui::WidgetBase::char_height);
     menu->draw(context, pivot, draw_flags);
 
     if (draw_flags & ui::DRAW_FORCE_F)

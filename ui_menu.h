@@ -32,6 +32,9 @@ public:
     Menu* add_entry(MenuEntry*);
     Menu* setup_view(uint8_t v_size);
 
+    void event_next();
+    void event_prev();
+
     const Size2d draw(ScreenDescriptor *context, const Point &location, const uint8_t flags);
 
 protected:

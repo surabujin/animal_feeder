@@ -58,18 +58,20 @@ DateTimeWidgetBase::DateTimeWidgetBase(parts_arr_t parts, spacers_arr_t spacers)
 }
 
 const Size2d DateTimeWidgetBase::draw(ScreenDescriptor *context, const Point &location, const uint8_t flags) {
-    PointPair step(location, location);
     int size_y;
+    Point pivot = location;
 	for (int pi = 0, si = 0; pi < parts.len; pi++, si++) {
-        step = draw_and_step(context, &parts.reference[pi], step.get_first(), flags);
+        PointPair step(draw_and_step(context, &parts.reference[pi], pivot, flags));
+        pivot = step.get_first();
         size_y = max(size_y, step.get_second().get_py() - location.get_py());
 		if (si < spacers.len) {
-            step = draw_and_step(context, &spacers.reference[si], step.get_first(), flags);
+            PointPair step(draw_and_step(context, &spacers.reference[si], pivot, flags));
+            pivot = step.get_first();
             size_y = max(size_y, step.get_second().get_py() - location.get_py());
 		}
 	}
 
-	return Size2d(step.get_first().get_px() - location.get_px(), size_y);
+	return Size2d(pivot.get_px() - location.get_px(), size_y);
 }
 
 DateWidget::DateWidget(Datime *subject_ptr) :

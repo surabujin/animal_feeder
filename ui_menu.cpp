@@ -3,6 +3,7 @@
  *
  */
 
+
 #include "ui_menu.h"
 
 namespace animal_feeder {
@@ -43,16 +44,51 @@ Menu* Menu::setup_view(uint8_t v_size) {
     return this;
 }
 
+void Menu::event_next() {
+    if (! entries_count)
+        return;
+
+    view_active_index = min(view_active_index + 1, entries_count - 1);
+    uint8_t seen_entries = view_v_size / char_height; // TODO: true height calculation
+    if (view_v_size % char_height)
+        seen_entries += 1;
+    if (! seen_entries)
+        return;
+    if (view_offset_index + seen_entries <= view_active_index) {
+        view_offset_index = view_active_index - (seen_entries - 1);
+    }
+}
+
+void Menu::event_prev() {
+    if (0 < view_active_index) {
+        view_active_index -= 1;
+        view_offset_index = min(view_offset_index, view_active_index);
+    }
+}
+
 const Size2d Menu::draw(ScreenDescriptor *context, const Point &location, const uint8_t flags) {
     if (! entries)
         return Size2d();
 
     uint16_t display_x_alloc = 0, display_y_alloc = 0;
-    PointPair pivot(location, location);
+    uint8_t marker_width = char_width + 2;
+    Point pivot = location;
+    const char *marks_active[2] = {">", "<"};
+    const char *marks_passive[2] = {" ", " "};
     for (uint8_t idx = view_offset_index; idx < entries_count && display_y_alloc < view_v_size; idx++) {
-        pivot = draw_and_step(context, entries[idx], pivot.get_second(), flags);
-        display_x_alloc = max(pivot.get_first().get_px() - location.get_px(), display_x_alloc);
-        display_y_alloc = pivot.get_second().get_py() - location.get_py();
+        PointPair step(draw_and_step(context, entries[idx], pivot.add_x(marker_width), flags));
+
+        const char **marks = idx == view_active_index ? marks_active : marks_passive;
+        screen_t *screen = context->get_screen();
+        screen->setCursorXY(0, pivot.get_py());
+        screen->print(marks[0]);
+        screen->setCursorXY(context->get_width_px() - char_width, pivot.get_py());
+        screen->print(marks[1]);
+
+        pivot = Point(location.get_px(), step.get_second().get_py());
+
+        display_x_alloc = max(step.get_first().get_px() - location.get_px(), display_x_alloc);
+        display_y_alloc = step.get_second().get_py() - location.get_py();
     }
 
     return Size2d(display_x_alloc, display_y_alloc);
