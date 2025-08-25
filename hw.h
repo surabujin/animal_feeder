@@ -16,7 +16,7 @@
 namespace animal_feeder {
 
 typedef GyverDS3231 rtc_t;
-typedef GyverOLED<SSD1306_128x64, OLED_NO_BUFFER> screen_t;
+using screen_t = GyverOLED<SSD1306_128x64, OLED_NO_BUFFER>;
 
 class ScreenDescriptor {
 protected:

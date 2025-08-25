@@ -33,6 +33,11 @@ int16_t Point::get_py() const {
 	return py;
 }
 
+const Point Point::add_x(int16_t value) { return Point(px + value, py); }
+const Point Point::add_y(int16_t value) { return Point(px, py + value); }
+
+Size2d::Size2d(): width(0), height(0) {}
+
 Size2d::Size2d(uint16_t w, uint16_t h) : width(w), height(h) {}
 
 Size2d::Size2d(const Size2d &other) {

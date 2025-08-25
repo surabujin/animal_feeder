@@ -33,6 +33,9 @@ public:
 
 	int16_t get_px() const;
 	int16_t get_py() const;
+
+    const Point add_x(int16_t value);
+    const Point add_y(int16_t value);
 };
 
 class Size2d {
@@ -40,6 +43,7 @@ protected:
 	uint16_t width, height;
 
 public:
+    Size2d();
 	Size2d(uint16_t w, uint16_t h);
 	Size2d(const Size2d &other);
 
@@ -79,8 +83,7 @@ public:
 
 	virtual const Size2d draw(ScreenDescriptor *context, const Point &location, const uint8_t flags) = 0;
 
-protected:
-    const PointPair draw_and_step(ScreenDescriptor *context, WidgetBase *widget, const Point &location, const uint8_t flags);
+    static const PointPair draw_and_step(ScreenDescriptor *context, WidgetBase *widget, const Point &location, const uint8_t flags);
 };
 
 class TextWidget : public WidgetBase {

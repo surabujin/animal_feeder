@@ -11,6 +11,7 @@
 #include "utils.h"
 #include "ui.h"
 #include "ui_datetime.h"
+#include "ui_menu.h"
 
 #include "app_base.h"
 #include "app_action.h"
@@ -20,6 +21,7 @@ namespace animal_feeder {
 class MainState : public AppState {
 protected:
     static const uint16_t screen_redraw_period_ms = 500;
+    static ui::Menu *menu;
 
     embd::UptimeReference now;
 
@@ -28,6 +30,8 @@ protected:
 
 private:
     ScreenRedrawAction redraw_action;
+
+    static ui::Menu* initMenu();
 
 public:
     MainState(App*);
