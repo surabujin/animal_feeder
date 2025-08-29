@@ -72,6 +72,7 @@ void MainState::redraw() {
     pivot = pivot.add_x(ui::WidgetBase::char_width);
     ui_time_now.draw(context, pivot, draw_flags);
 
+//    context->get_screen()->line(32, 4, 96, 92, 1);
     pivot = ui::Point(0, 1 * ui::WidgetBase::char_height);
     menu->draw(context, pivot, draw_flags);
 

@@ -74,6 +74,8 @@ PointPair::PointPair(const PointPair &other) : first(other.first), second(other.
 const Point PointPair::get_first() const { return first; }
 const Point PointPair::get_second() const { return second; }
 
+WidgetBase::WidgetBase() : flags(DIRTY_F) {}
+
 const PointPair WidgetBase::draw_and_step(ScreenDescriptor *context,
         WidgetBase *widget, const Point &location, const uint8_t flags) {
     Size2d size = widget->draw(context, location, flags);
@@ -82,20 +84,20 @@ const PointPair WidgetBase::draw_and_step(ScreenDescriptor *context,
             location.add_y(size.get_height()));
 }
 
-TextWidget::TextWidget(const char *content) : text(content), flags(0) {
+TextWidget::TextWidget(const char *content) : text(content) {
 	length_ch = strlen(text);
 }
 
 const Size2d TextWidget::draw(ScreenDescriptor *context, const Point &location, const uint8_t flags) {
     const Size2d screen_size(length_ch * char_width, char_height);
-    if (!(flags & DRAW_FORCE_F) && (this->flags & VISIBLE_F)) {
+    if (!(flags & DRAW_FORCE_F) && !(this->flags & DIRTY_F)) {
         return screen_size;
-	}
+    }
 
 	screen_t *screen = context->get_screen();
 	screen->setCursorXY(location.get_px(), location.get_py());
 	screen->print(text);
-	this->flags |= VISIBLE_F;
+    this->flags &= ~DIRTY_F;
 
     return screen_size;
 }

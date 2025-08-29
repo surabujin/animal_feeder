@@ -79,6 +79,14 @@ public:
 };
 
 class WidgetBase {
+protected:
+    enum Flags_t {
+        DIRTY_F = 0x01
+    };
+
+    uint8_t flags;
+
+    WidgetBase();
 public:
     static const uint8_t char_width = 6, char_height = 8;
 
@@ -91,11 +99,6 @@ public:
 
 class TextWidget : public WidgetBase {
 protected:
-	enum Flags_t {
-		VISIBLE_F = 0x01
-	};
-
-	uint8_t flags;
 	const char* text;
 	uint16_t length_ch;
 
